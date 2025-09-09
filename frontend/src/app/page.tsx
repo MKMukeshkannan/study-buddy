@@ -198,7 +198,7 @@ export default function Page() {
         const currentPage = { ...newPages[currentPageIndex] };
     
         const newButton: Button = {
-          id: 'newButton',
+          id: `button_${pages[current_page].buttons.length + 1}`,
           content: '',
           navigate_to: 0,
           pos_x: 0,
@@ -212,7 +212,7 @@ export default function Page() {
       });
     };
 
-    const addEmptyCharacter = (currentPageIndex: number) => {
+    const addEmptyCharacter = (currentPageIndex: number, file_name: string) => {
       set_pages(prevPages => {
         if (!prevPages) return prevPages;
     
@@ -220,8 +220,8 @@ export default function Page() {
         const currentPage = { ...newPages[currentPageIndex] };
     
         const newCharacter: Character = {
-          id: 'newCharacter',
-          file_name: '',
+          id: `char_${pages[current_page].characters.length + 1}`,
+          file_name: file_name,
           pos_x: 0,
           pos_y: 0
         };
@@ -241,7 +241,7 @@ export default function Page() {
         const currentPage = { ...newPages[currentPageIndex] };
     
         const newText: Text = {
-          id: 'New Text',
+          id: `text_${pages[current_page].texts.length + 1}`,
           content: '',
           pos_x: 0,
           pos_y: 0
@@ -254,11 +254,6 @@ export default function Page() {
       });
     };
 
-    
-
-
-
-
   return (
     <main className="flex h-screen ">
         <aside className="h-full bg-accent-black w-full max-w-[250px] p-10 overflow-scroll drop-shadow-xs text-white">
@@ -269,12 +264,12 @@ export default function Page() {
 
             <h1 className="text-2xl font-black">Teachers</h1>
             <section className="flex flex-col items-center justify-center space-y-5 pt-3 ">
-                { teacher_paths.map((val, ind) => { return <div key={ind} className="w-full border flex items-center justify-center p-5 bg-accent-beige hover:bg-secondary-beige cursor-pointer rounded-xl"><img key={ind} src={val} className="h-60" /></div>; }) }
+                { teacher_paths.map((val, ind) => { return <div onClick={() => addEmptyCharacter(current_page, val)} key={ind} className="w-full border flex items-center justify-center p-5 bg-accent-beige hover:bg-secondary-beige cursor-pointer rounded-xl"><img key={ind} src={val} className="h-60" /></div>; }) }
             </section>
 
             <h1 className="text-2xl  font-black  pt-10">Children</h1>
             <section className="flex flex-col items-center justify-center space-y-5 pt-3">
-                { student_paths.map((val, ind) => { return <div key={ind} className="w-full border flex items-center justify-center p-5 bg-accent-beige hover:bg-secondary-beige cursor-pointer rounded-xl"><img key={ind} src={val} className="h-60" /></div>; }) }
+                { student_paths.map((val, ind) => { return <div onClick={() => addEmptyCharacter(current_page, val)} key={ind} className="w-full border flex items-center justify-center p-5 bg-accent-beige hover:bg-secondary-beige cursor-pointer rounded-xl"><img key={ind} src={val} className="h-60" /></div>; }) }
             </section>
         </aside>
 
@@ -329,11 +324,13 @@ export default function Page() {
                           {/* File Name Input */}
                           <div className="flex items-center justify-between">
                             <label className="font-medium ">Name:</label>
-                            <input
-                              type="text"
-                              value={val.file_name}
-                              onChange={(e) => update_character_field(ind, 'file_name', e.target.value)}
-                            />
+                            <select onChange={(e) => update_character_field(ind, 'file_name', e.target.value)} className="bg-pink-400">
+                                <option value="teacher_1.svg">Teacher 1</option>
+                                <option value="teacher_2.svg">Teacher 2</option>
+                                <option value="teacher_3.svg">Teacher 3</option>
+                                <option value="student_1.svg">Child 1</option>
+                                <option value="student_2.svg">Child 2</option>
+                            </select>
                           </div>
                         
                           {/* Position X Slider */}
