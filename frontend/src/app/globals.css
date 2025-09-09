@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme {
+  --color-accent-black: oklch(0.1907 0.0335 269.84); 
+  --color-accent-beige: oklch(0.9435 0.0058 84.57);
+  --color-secondary-beige: oklch(0.9671 0.0041 91.45);
+}
