@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "types": ["node"],
+    "module": "es2020",
+    "moduleResolution": "node",
+    "strict": true,
+    "target": "es2017",
+    "sourceMap": true,
+    "outDir": "dist",
+    "allowJs": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src/**/*"]
+}
+

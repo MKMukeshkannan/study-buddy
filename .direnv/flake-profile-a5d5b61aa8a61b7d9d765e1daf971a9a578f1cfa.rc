@@ -166,7 +166,7 @@ name='nix-shell-env'
 export name
 nativeBuildInputs=''
 export nativeBuildInputs
-out='/Users/mukeshkannan/mk/dev/study_buddy/outputs/out'
+out='/Users/mukeshkannan/mk/dev/study-buddy/outputs/out'
 export out
 outputBin='out'
 outputDev='out'
@@ -197,7 +197,7 @@ preConfigurePhases=' updateAutotoolsGnuConfigScriptsPhase'
 declare -a preFixupHooks=('_moveToShare' '_multioutDocs' '_multioutDevs' )
 preferLocalBuild='1'
 export preferLocalBuild
-prefix='/Users/mukeshkannan/mk/dev/study_buddy/outputs/out'
+prefix='/Users/mukeshkannan/mk/dev/study-buddy/outputs/out'
 declare -a propagatedBuildDepFiles=('propagated-build-build-deps' 'propagated-native-build-inputs' 'propagated-build-target-deps' )
 propagatedBuildInputs=''
 export propagatedBuildInputs
