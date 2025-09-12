@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { BACKEND } from "@/lib/utils";
 
 export default function Home() {
   const router = useRouter();
@@ -18,11 +19,43 @@ export default function Home() {
     e.preventDefault();
     setError(""); 
 
-    try {
-      // login logic
-    } catch (err) {
-      console.error(err);
-      setError("An unexpected error occurred. Please try again later.");
+     try {
+    if (!email || !password) {
+      throw new Error("Email and password are required");
+    }
+
+    const role = isStudent ? "STUDENT" : "STAFF";
+
+    const res = await fetch(BACKEND + "api/v1/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          role,
+        }),
+        credentials: "include", // only if backend uses cookies/sessions
+      });
+
+      if (!res.ok) {
+        const { message } = await res.json();
+        throw new Error(message || "Login failed");
+      }
+
+      const data = await res.json();
+
+      // Example: save JWT in localStorage
+      localStorage.setItem("token", data.token);
+
+      // Clear fields
+      setEmail("");
+      setPassword("");
+      setIsStudent(false);
+
+    } catch (err: any) {
+      setError(err.message || "Something went wrong");
     }
   };
 

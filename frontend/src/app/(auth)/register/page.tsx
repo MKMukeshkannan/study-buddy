@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { BACKEND } from "@/lib/utils";
 
 export default function Home() {
   const router = useRouter();
@@ -22,8 +23,35 @@ export default function Home() {
     setIsLoading(true); 
 
     try {
+        if (!name || !email || !password) {
+            throw new Error("All fields are required");
+        }
 
-      // REGISTER LOGIC
+        const role = isStudent ? "STUDENT" : "STAFF";
+
+        const res = await fetch(BACKEND + "api/v1/auth/signup", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                name,
+                email,
+                password,
+                role,
+            }),
+        });
+
+        if (!res.ok) {
+            const { message } = await res.json();
+            throw new Error(message || "Signup failed");
+        }
+
+        setName("");
+        setEmail("");
+        setPassword("");
+        setIsStudent(false);
+
     } catch (err: any) {
       console.error("Registration failed:", err);
       setError(err.response?.data?.error || "Something went wrong. Please try again.");

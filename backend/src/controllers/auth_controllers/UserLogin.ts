@@ -1,7 +1,7 @@
 import {Response, Request} from 'express'
 import bcrypt from "bcrypt";
 import { z } from "zod";
-import { generate_access_token, generate_refresh_token, pool } from "../../utils/config.js";
+import { pool } from "../../utils/config.js";
 
 export const userLoginSchema = z.object({
   email: z.string().trim().email("Invalid email address"),
