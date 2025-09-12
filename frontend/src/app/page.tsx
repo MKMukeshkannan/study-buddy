@@ -92,6 +92,8 @@ export default function Page() {
   const [current_page, set_current_page] = useState<number>(0);
   useEffect(() => {console.log(current_page)}, [current_page])
 
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
   const [pages, set_pages] = useState<Pages[]>([
       {
         characters: [
@@ -254,9 +256,76 @@ export default function Page() {
       });
     };
 
+    const downloadJSON = () => {
+        const jsonString = JSON.stringify(pages, null, 2);
+        const blob = new Blob([jsonString], { type: 'application/json' });
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'pages.json'; 
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        
+        URL.revokeObjectURL(url);
+      };
+
+    const handleUploadClick = () => {
+        fileInputRef.current?.click();
+    };
+    
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+    
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const text = e.target?.result;
+                if (typeof text !== 'string') {
+                    throw new Error("File could not be read as text.");
+                }
+                const parsedData = JSON.parse(text);
+    
+                if (Array.isArray(parsedData) && parsedData.every(page =>
+                    typeof page === 'object' && page !== null &&
+                    Array.isArray(page.characters) &&
+                    Array.isArray(page.texts) &&
+                    Array.isArray(page.buttons)
+                )) {
+                    set_pages(parsedData);
+                    set_current_page(0);
+                } else {
+                    console.error("Invalid JSON format.");
+                }
+            } catch (error) {
+                console.error("Error parsing JSON file:", error);
+            }
+        };
+        reader.readAsText(file);
+    };
+
   return (
     <main className="flex h-screen ">
         <aside className="h-full bg-accent-black w-full max-w-[250px] p-10 overflow-scroll drop-shadow-xs text-white">
+            <div className="space-y-2 mb-6">
+              <button onClick={downloadJSON} className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md mb-6 transition-colors">
+                Download JSON
+              </button>
+              <button onClick={handleUploadClick} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">
+                  Upload JSON
+              </button>
+            </div>
+
+            <input 
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept=".json"
+              style={{ display: 'none' }}
+            />
+
             <h1 className="text-4xl font-black mb-4">Elements</h1>
 
             <h1 onClick={() => {addEmptyText(current_page)}} className="text-2xl font-black cursor-pointer">Text</h1>
