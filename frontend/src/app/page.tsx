@@ -305,6 +305,53 @@ export default function Page() {
         };
         reader.readAsText(file);
     };
+  
+    const deleteButton = (buttonIndex: number) => {
+        set_pages(prevPages => {
+            const newPages = [...prevPages];
+            const pageToUpdate = { ...newPages[current_page] };
+            pageToUpdate.buttons = pageToUpdate.buttons.filter((_, index) => index !== buttonIndex);
+            newPages[current_page] = pageToUpdate;
+            return newPages;
+        });
+    };
+    
+    const deleteCharacter = (charIndex: number) => {
+        set_pages(prevPages => {
+            const newPages = [...prevPages];
+            const pageToUpdate = { ...newPages[current_page] };
+            pageToUpdate.characters = pageToUpdate.characters.filter((_, index) => index !== charIndex);
+            newPages[current_page] = pageToUpdate;
+            return newPages;
+        });
+    };
+    
+    const deleteText = (textIndex: number) => {
+        set_pages(prevPages => {
+            const newPages = [...prevPages];
+            const pageToUpdate = { ...newPages[current_page] };
+            pageToUpdate.texts = pageToUpdate.texts.filter((_, index) => index !== textIndex);
+            newPages[current_page] = pageToUpdate;
+            return newPages;
+        });
+    };
+
+    // Delete Page
+    const deletePage = (pageIndex: number) => {
+        if (pages.length <= 1) {
+            alert("You cannot delete the last page.");
+            return;
+        }
+        set_pages(prevPages => prevPages.filter((_, index) => index !== pageIndex));
+        set_current_page(prev => {
+            if (prev === pageIndex) {
+                return Math.max(0, prev - 1);
+            } else if (prev > pageIndex) {
+                return prev - 1;
+            }
+            return prev;
+        });
+    };
 
   return (
     <main className="flex h-screen ">
@@ -349,7 +396,7 @@ export default function Page() {
                 {
                     pages[current_page].buttons.map((val, ind) => { 
                         return <div key={ind} className="">
-                            <CollapsedCard name={val.id}>
+                            <CollapsedCard name={val.id} onDelete={() => deleteButton(ind)}>
                                 <div className="flex items-center justify-between">
                                   <label className="font-medium pr-5"> Content: </label>
                                   <input type="text" value={val.content} onChange={(e) => update_button_field(ind, 'content', e.target.value)} />
@@ -389,7 +436,7 @@ export default function Page() {
                 {
                     pages[current_page].characters.map((val, ind) => (
                       <div key={ind}>
-                       <CollapsedCard name={val.id}>
+                       <CollapsedCard name={val.id} onDelete={() => deleteCharacter(ind)}>
                           {/* File Name Input */}
                           <div className="flex items-center justify-between">
                             <label className="font-medium ">Name:</label>
@@ -434,7 +481,7 @@ export default function Page() {
                     {
                     pages[current_page].texts.map((val, ind) => (
                        <div key={ind}>
-                       <CollapsedCard name={val.id}>
+                       <CollapsedCard name={val.id} onDelete={() => deleteText(ind)}>
                           <div className="space-y-3">
                             <div className="flex items-center justify-between">
                               <label className="font-medium pr-5">Content:</label>
@@ -479,36 +526,72 @@ export default function Page() {
             <CanvasPage set_current_page={set_current_page} pageData={pages[current_page]} />
         </section>
 
+        {/* PAGE */}
         <section className="w-24 h-full bg-gray-50 rounded-l-2xl border-l border-l-gray-100 flex flex-col items-center py-10 space-y-3">
-            {pages.map((_, ind) => (<h1 key={ind} onClick={() => set_current_page(ind)} className={`w-10 h-10 cursor-pointer rounded-full flex font-black items-center justify-center ${current_page === ind ? 'bg-neutral-800 text-white' : 'bg-neutral-300 text-white'}`}>{ind + 1}</h1>))}
-            <h1 onClick={() => set_pages([...pages, {buttons:[], texts: [], characters:[]}])} className={`w-10 h-10 cursor-pointer rounded-full flex font-black items-center justify-center text-white bg-neutral-300`}>+</h1>
+            {pages.map((_, ind) => (
+                <div key={ind} className="relative group">
+                    <h1 
+                        onClick={() => set_current_page(ind)} 
+                        className={`w-10 h-10 cursor-pointer rounded-full flex font-black items-center justify-center transition-colors ${current_page === ind ? 'bg-neutral-800 text-white' : 'bg-neutral-300 text-black'}`}
+                    >
+                        {ind + 1}
+                    </h1>
+                    
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation(); 
+                            deletePage(ind);
+                        }}
+                        className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity"
+                        aria-label={`Delete page ${ind + 1}`}
+                    >
+                        X
+                    </button>
+                </div>
+            ))}
+            
+            <h1 onClick={() => set_pages([...pages, { buttons: [], texts: [], characters: [] }])} className={`w-10 h-10 cursor-pointer rounded-full flex font-black items-center justify-center text-white bg-neutral-400`}>
+                +
+            </h1>
         </section>
     </main>
   );
 };
 
-
-interface props {
-    name: string
+interface CollapsedCardProps {
+    name: string;
     children?: React.ReactNode;
+    onDelete: () => void; 
 };
-function CollapsedCard({name, children}: props) {
-  const [isOpen, setIsOpen] = useState(false);
 
-  const toggleCollapse = () => {
-    setIsOpen(!isOpen);
-  };
+function CollapsedCard({ name, children, onDelete }: CollapsedCardProps) {
+    const [isOpen, setIsOpen] = useState(false);
 
-  return (
-    <div className="w-full">
-      <h1 className="flex items-center justify-between cursor-pointer" onClick={toggleCollapse}>
-        {name} <span>{isOpen ? '▲' : '▼'}</span>
-      </h1>
+    const toggleCollapse = () => {
+        setIsOpen(!isOpen);
+    };
 
-      {
-          isOpen && <div className="px-5">{children}</div>
-      }
+    const handleDelete = (e: React.MouseEvent) => {
+        e.stopPropagation(); 
+        onDelete();
+    };
 
-    </div>
-  );
+    return (
+        <div className="w-full border-b border-gray-600 py-2">
+            <div className="flex items-center justify-between cursor-pointer" onClick={toggleCollapse}>
+                <span className="font-bold">{name}</span>
+                <div className="flex items-center space-x-3">
+                    <span onClick={handleDelete} className="cursor-pointer hover:text-red-500 text-lg">
+                        🗑️
+                    </span>
+                    <span>{isOpen ? '▲' : '▼'}</span>
+                </div>
+            </div>
+
+            {
+                isOpen && <div className="p-4 mt-2 bg-gray-700 rounded-md space-y-3">{children}</div>
+            }
+
+        </div>
+    );
 }
