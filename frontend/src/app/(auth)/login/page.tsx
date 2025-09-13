@@ -1,19 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BACKEND } from "@/lib/utils";
+import { User, useUserStore } from "@/lib/store";
 
 export default function Home() {
+
+
   const router = useRouter();
+  const {user, resetUser, setUser} = useUserStore();
+
+  useEffect(() => {
+    if (user) {
+        //resetUser();
+    }
+  }, [user, router]);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isStudent, setIsStudent] = useState(false); // for the checkbox
   const [error, setError] = useState("");
+
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -44,15 +55,18 @@ export default function Home() {
         throw new Error(message || "Login failed");
       }
 
-      const data = await res.json();
-
-      // Example: save JWT in localStorage
-      localStorage.setItem("token", data.token);
+      const data  = await res.json();
+      const user: User = { name: data.name, email: data.email, role: isStudent ? 'STUDENT' : 'STAFF' };
+      
 
       // Clear fields
       setEmail("");
       setPassword("");
       setIsStudent(false);
+
+      setUser(user);
+      if (isStudent) router.push('/student')
+      else router.push('/teacher');
 
     } catch (err: any) {
       setError(err.message || "Something went wrong");
