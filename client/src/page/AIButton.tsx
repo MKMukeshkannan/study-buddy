@@ -37,7 +37,7 @@ const SimpleForm: React.FC<SimpleFormProps> = ({ externalSetState }) => {
 
       const data = await response.json();
 
-      externalSetState(data); // Update the external state with the response data
+      externalSetState(data.canvasContent); // Update the external state with the response data
 
     } catch (error: any) {
       setError(error.message); // Set error state if something went wrong
