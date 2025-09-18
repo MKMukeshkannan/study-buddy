@@ -1,6 +1,7 @@
 'use client'
 
-import { IconArrowNarrowDown, IconArrowNarrowUp, IconX } from '@tabler/icons-react'
+import { v4 as uuidv4 } from 'uuid';
+import { IconArrowNarrowDown, IconArrowNarrowUp, IconPlus, IconX } from '@tabler/icons-react'
 import React, { useRef, useState } from 'react'
 import { Rnd } from 'react-rnd'
 
@@ -21,14 +22,342 @@ export type Element = RectElement | TextElement | ImageElement | ButtonElement
 
 export default function CanvaLikeApp() {
   const canvasRef = useRef<HTMLDivElement>(null)
-  const [elements, setElements] = useState<Element[]>([])
+  const [frames, setFrames] = useState<Element[][]>(
+      [
+        [
+            {
+                "height": 250,
+                "id": "teacher_intro_f0",
+                "src": "teacher_1.svg",
+                "type": "image",
+                "width": 150,
+                "x": 325,
+                "y": 200
+            },
+            {
+                "fontSize": 24,
+                "height": 50,
+                "id": "text_intro_f0",
+                "text": "Welcome! Today, we'll learn about chemical bonding.",
+                "type": "text",
+                "width": 500,
+                "x": 150,
+                "y": 80
+            },
+            {
+                "height": 40,
+                "id": "start_button_f0",
+                "navigateTo": 1,
+                "text": "Let's Start",
+                "type": "button",
+                "width": 100,
+                "x": 350,
+                "y": 150
+            }
+        ],
+        [
+            {
+                "height": 250,
+                "id": "teacher_menu_f1",
+                "src": "teacher_1.svg",
+                "type": "image",
+                "width": 150,
+                "x": 50,
+                "y": 200
+            },
+            {
+                "fontSize": 22,
+                "height": 50,
+                "id": "text_menu_f1",
+                "text": "There are three main types. Which one first?",
+                "type": "text",
+                "width": 500,
+                "x": 250,
+                "y": 80
+            },
+            {
+                "height": 40,
+                "id": "ionic_button_f1",
+                "navigateTo": 2,
+                "text": "Ionic Bonds",
+                "type": "button",
+                "width": 150,
+                "x": 350,
+                "y": 150
+            },
+            {
+                "height": 40,
+                "id": "covalent_button_f1",
+                "navigateTo": 3,
+                "text": "Covalent Bonds",
+                "type": "button",
+                "width": 150,
+                "x": 350,
+                "y": 210
+            },
+            {
+                "height": 40,
+                "id": "metallic_button_f1",
+                "navigateTo": 4,
+                "text": "Metallic Bonds",
+                "type": "button",
+                "width": 150,
+                "x": 350,
+                "y": 270
+            }
+        ],
+        [
+            {
+                "height": 250,
+                "id": "teacher_ionic_f2",
+                "src": "teacher_2.svg",
+                "type": "image",
+                "width": 150,
+                "x": 50,
+                "y": 200
+            },
+            {
+                "height": 200,
+                "id": "atom_giver_f2",
+                "src": "student_1.svg",
+                "type": "image",
+                "width": 150,
+                "x": 300,
+                "y": 220
+            },
+            {
+                "height": 200,
+                "id": "atom_taker_f2",
+                "src": "student_2.svg",
+                "type": "image",
+                "width": 150,
+                "x": 550,
+                "y": 220
+            },
+            {
+                "fontSize": 20,
+                "height": 50,
+                "id": "text_ionic_f2",
+                "text": "Ionic bonds: One atom gives an electron to another.",
+                "type": "text",
+                "width": 600,
+                "x": 100,
+                "y": 50
+            },
+            {
+                "height": 40,
+                "id": "button_menu_f2",
+                "navigateTo": 1,
+                "text": "Back to Menu",
+                "type": "button",
+                "width": 150,
+                "x": 420,
+                "y": 120
+            }
+        ],
+        [
+            {
+                "height": 250,
+                "id": "teacher_covalent_f3",
+                "src": "teacher_3.svg",
+                "type": "image",
+                "width": 150,
+                "x": 50,
+                "y": 200
+            },
+            {
+                "height": 200,
+                "id": "atom_sharer1_f3",
+                "src": "student_1.svg",
+                "type": "image",
+                "width": 150,
+                "x": 375,
+                "y": 220
+            },
+            {
+                "height": 200,
+                "id": "atom_sharer2_f3",
+                "src": "student_1.svg",
+                "type": "image",
+                "width": 150,
+                "x": 475,
+                "y": 220
+            },
+            {
+                "fontSize": 20,
+                "height": 50,
+                "id": "text_covalent_f3",
+                "text": "Covalent bonds: Atoms share electrons to become stable.",
+                "type": "text",
+                "width": 600,
+                "x": 100,
+                "y": 50
+            },
+            {
+                "height": 40,
+                "id": "button_menu_f3",
+                "navigateTo": 1,
+                "text": "Back to Menu",
+                "type": "button",
+                "width": 150,
+                "x": 420,
+                "y": 120
+            }
+        ],
+        [
+            {
+                "height": 250,
+                "id": "teacher_metallic_f4",
+                "src": "teacher_1.svg",
+                "type": "image",
+                "width": 150,
+                "x": 50,
+                "y": 200
+            },
+            {
+                "fontSize": 20,
+                "height": 50,
+                "id": "text_metallic_f4",
+                "text": "Metallic bonds are a 'sea' of electrons shared among atoms.",
+                "type": "text",
+                "width": 600,
+                "x": 100,
+                "y": 50
+            },
+            {
+                "height": 133,
+                "id": "atom_metal1_f4",
+                "src": "student_2.svg",
+                "type": "image",
+                "width": 100,
+                "x": 300,
+                "y": 250
+            },
+            {
+                "height": 133,
+                "id": "atom_metal2_f4",
+                "src": "student_2.svg",
+                "type": "image",
+                "width": 100,
+                "x": 400,
+                "y": 250
+            },
+            {
+                "height": 133,
+                "id": "atom_metal3_f4",
+                "src": "student_2.svg",
+                "type": "image",
+                "width": 100,
+                "x": 500,
+                "y": 250
+            },
+            {
+                "height": 40,
+                "id": "button_end_f4",
+                "navigateTo": 5,
+                "text": "Finish Lesson",
+                "type": "button",
+                "width": 150,
+                "x": 420,
+                "y": 120
+            }
+        ],
+        [
+            {
+                "height": 250,
+                "id": "teacher_end_f5",
+                "src": "teacher_1.svg",
+                "type": "image",
+                "width": 150,
+                "x": 325,
+                "y": 200
+            },
+            {
+                "fontSize": 24,
+                "height": 50,
+                "id": "text_end_f5",
+                "text": "Great work! You've learned the basics of bonding.",
+                "type": "text",
+                "width": 500,
+                "x": 150,
+                "y": 80
+            },
+            {
+                "height": 40,
+                "id": "restart_button_f5",
+                "navigateTo": 0,
+                "text": "Start Over",
+                "type": "button",
+                "width": 100,
+                "x": 350,
+                "y": 150
+            }
+        ]
+    ]
+  )
+  const [selectedPage, setSelectedPage] = useState<number>(0)
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [canvasSize, setCanvasSize] = useState<{ width: number; height: number }>({ width: 800, height: 600, })
+  const [canvasSize, setCanvasSize] = useState<{ width: number; height: number }>({ width: 800, height: 480, })
+
+  const move = (
+      frameIndex: number,
+      elementId: string,
+      direction: "up" | "down"
+    ) => {
+      setFrames(prev => {
+        const newFrames = prev.slice();
+        const sub = newFrames[frameIndex];
+        if (!sub) return prev;
+    
+        const idx = sub.findIndex(el => el.id === elementId);
+        if (idx === -1) return prev;
+    
+        const newSub = sub.slice();
+    
+        if (direction === "up" && idx > 0) {
+          [newSub[idx - 1], newSub[idx]] = [newSub[idx], newSub[idx - 1]];
+        } else if (direction === "down" && idx < newSub.length - 1) {
+          [newSub[idx + 1], newSub[idx]] = [newSub[idx], newSub[idx + 1]];
+        } else {
+          return prev; // can't move further
+        }
+    
+        newFrames[frameIndex] = newSub;
+        return newFrames;
+      });
+    };
+
+
+  const remove = (index: number, elementId: string) => {
+      setFrames(prev => {
+        const newFrames = prev.slice();
+        const sub = newFrames[index];
+        if (!sub) return prev;
+    
+        const filtered = sub.filter(el => el.id !== elementId);
+        if (filtered.length === sub.length) return prev; // nothing removed
+    
+        newFrames[index] = filtered;
+        return newFrames;
+      });
+    };
+
+
+  const update = (index: number, elementId: string, patch: Partial<Element>) => {
+      setFrames(prev => {
+        const newFrames = [...prev];
+        if (!newFrames[index]) return prev; // nothing to update
+    
+        newFrames[index] = newFrames[index].map(el =>
+          el.id === elementId ? { ...el, ...patch } : el
+        ) as Element[];
+    
+        return newFrames;
+      });
+    };
 
   const handleDragStop = (id: string, x: number, y: number) => {
-    setElements(prev =>
-      prev.map(el => (el.id === id ? { ...el, x, y } : el))
-    )
+    update(selectedPage, id, { x, y})
   }
 
   const handleResizeStop = (
@@ -37,14 +366,19 @@ export default function CanvaLikeApp() {
     y: number,
     width: number,
     height: number
-  ) => {
-    setElements(prev =>
-      prev.map(el =>
-        el.id === id ? { ...el, x, y, width, height } : el
-      )
-    )
-  }
+  ) => { update(selectedPage, id, { x, y, height, width}) }
 
+  const pushElement = (element: Element, index: number) => {
+    setFrames(prev => {
+      // Ensure the sub-array exists
+      const newFrames = [...prev];
+      if (!newFrames[index]) newFrames[index] = [];
+      newFrames[index] = [...newFrames[index], element];
+      return newFrames;
+    });
+  };
+
+  console.log(frames[selectedPage])
   return (
     <div className="flex h-screen bg-base-200">
 
@@ -58,18 +392,7 @@ export default function CanvaLikeApp() {
               key={ind}
               className="btn w-40 h-40 overflow-hidden rounded-lg border p-2"
               onClick={() =>
-                setElements(prev => [
-                  ...prev,
-                  {
-                    id: Date.now().toString(),
-                    type: 'image',
-                    src: val,
-                    x: 100,
-                    y: 100,
-                    width: 120,
-                    height: 120,
-                  } as ImageElement,
-                ])
+                  pushElement({ id: uuidv4(), type: 'image', src: val, x: 100, y: 100, width: 120, height: 120, } as ImageElement, selectedPage)
               }
             >
               <img
@@ -85,21 +408,7 @@ export default function CanvaLikeApp() {
           <h3 className="text-lg font-semibold mt-6">Insert Elements</h3>
           <button
             className="btn btn-outline w-40"
-            onClick={() =>
-              setElements(prev => [
-                ...prev,
-                {
-                  id: Date.now().toString(),
-                  type: 'text',
-                  text: 'New Text',
-                  fontSize: 20,
-                  x: 150,
-                  y: 150,
-                  width: 200,
-                  height: 50,
-                } as TextElement,
-              ])
-            }
+            onClick={() => pushElement({ id: uuidv4(), type: 'text', text: 'New Text', fontSize: 20, x: 150, y: 150, width: 200, height: 50, } as TextElement, selectedPage)}
           >
             Text
           </button>
@@ -108,19 +417,7 @@ export default function CanvaLikeApp() {
           <button
             className="btn btn-outline w-40"
             onClick={() =>
-              setElements(prev => [
-                ...prev,
-                {
-                  id: Date.now().toString(),
-                  type: 'button',
-                  text: 'Click Me',
-                  navigateTo: 0,
-                  x: 200,
-                  y: 200,
-                  width: 150,
-                  height: 50,
-                } as ButtonElement,
-              ])
+                pushElement({ id: uuidv4(), type: 'button', text: 'Click Me', navigateTo: 0, x: 200, y: 200, width: 150, height: 50, } as ButtonElement, selectedPage)
             }
           >
             Button
@@ -129,19 +426,7 @@ export default function CanvaLikeApp() {
           {/* Add Rectangle */}
           <button
             className="btn btn-outline w-40"
-            onClick={() =>
-              setElements(prev => [
-                ...prev,
-                {
-                  id: Date.now().toString(),
-                  type: 'rect',
-                  x: 250,
-                  y: 250,
-                  width: 120,
-                  height: 80,
-                } as RectElement,
-              ])
-            }
+            onClick={() => pushElement({ id: uuidv4(), type: 'rect', x: 250, y: 250, width: 120, height: 80, }, selectedPage) }
           >
             Rectangle
           </button>
@@ -150,7 +435,7 @@ export default function CanvaLikeApp() {
 
       {/* Main Canvas */}
       <main className="flex-1 p-6 bg-gray-200 flex flex-col">
-          {/* Document size controls */}
+          {/* Document size controls 
           <div className="mb-4 flex space-x-4">
             <label className="flex items-center space-x-2">
               <span>Width</span>
@@ -174,7 +459,7 @@ export default function CanvaLikeApp() {
                 }
               />
             </label>
-          </div>
+          </div>*/}
         
           {/* Canvas area */}
           <div className="flex-1 flex justify-center items-center overflow-hidden">
@@ -186,7 +471,7 @@ export default function CanvaLikeApp() {
                 height: canvasSize.height,
               }}
             >
-              {elements.map((el) => (
+              {frames[selectedPage].map((el) => (
                 <Rnd
                   key={el.id}
                   size={{ width: el.width, height: el.height }}
@@ -237,7 +522,12 @@ export default function CanvaLikeApp() {
           </div>
       </main>
 
-      <aside className='w-14 min-h-screen'>
+      <aside className='w-14 min-h-screen flex flex-col items-center justify-center overflow-auto space-y-3'>
+        {frames.map((_, key) => <div key={key} onClick={() => setSelectedPage(key)} className={`w-10 h-10 rounded-full ${key === selectedPage ? 'btn' : 'btn btn-ghost'}  flex items-center justify-center cursor-pointer select-none`}>{key}</div>)}
+
+        <div onClick={()=>{setFrames(prev=>[...prev, []])}} className='w-10 h-10 rounded-full bg-primary text-primary-content flex items-center justify-center cursor-pointer select-none'>
+            <IconPlus />
+        </div>
       </aside>
 
       <aside className='max-w-72 flex flex-col justify-between'>
@@ -246,15 +536,8 @@ export default function CanvaLikeApp() {
     
           {selectedId ? (
             (() => {
-              const el = elements.find(e => e.id === selectedId)
+              const el = frames[selectedPage].find(e => e.id === selectedId)
               if (!el) return null
-    
-              // safe updater: accept a partial patch of Element and merge it
-              const update = (patch: Partial<Element>) => {
-                setElements(prev =>
-                  prev.map(e => (e.id === el.id ? ({ ...e, ...patch } as Element) : e))
-                )
-              }
     
               return (
                 <div className="space-y-3 text-sm">
@@ -266,7 +549,7 @@ export default function CanvaLikeApp() {
                       className="input input-bordered w-full"
                       value={el.x}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        update({ x: Number(e.target.value) })
+                        update(selectedPage, el.id, { x: Number(e.target.value) })
                       }
                     />
                   </div>
@@ -278,7 +561,7 @@ export default function CanvaLikeApp() {
                       className="input input-bordered w-full"
                       value={el.y}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        update({ y: Number(e.target.value) })
+                        update(selectedPage, el.id, { y: Number(e.target.value) })
                       }
                     />
                   </div>
@@ -290,7 +573,7 @@ export default function CanvaLikeApp() {
                       className="input input-bordered w-full"
                       value={el.width}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        update({ width: Number(e.target.value) })
+                        update(selectedPage, el.id, { width: Number(e.target.value) })
                       }
                     />
                   </div>
@@ -302,7 +585,7 @@ export default function CanvaLikeApp() {
                       className="input input-bordered w-full"
                       value={el.height}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        update({ height: Number(e.target.value) })
+                        update(selectedPage, el.id, { width: Number(e.target.value) })
                       }
                     />
                   </div>
@@ -319,7 +602,7 @@ export default function CanvaLikeApp() {
                             className="input input-bordered w-full"
                             value={t.text}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                              update({ text: e.target.value })
+                              update(selectedPage, el.id, { text: e.target.value })
                             }
                           />
                         </div>
@@ -331,7 +614,7 @@ export default function CanvaLikeApp() {
                             className="input input-bordered w-full"
                             value={t.fontSize}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                              update({ fontSize: Number(e.target.value) })
+                             update(selectedPage, el.id, { fontSize: Number(e.target.value) })
                             }
                           />
                         </div>
@@ -350,7 +633,7 @@ export default function CanvaLikeApp() {
                             className="input input-bordered w-full"
                             value={b.text}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                              update({ text: e.target.value })
+                            update(selectedPage, el.id, { text: e.target.value })
                             }
                           />
                         </div>
@@ -362,7 +645,7 @@ export default function CanvaLikeApp() {
                             className="input input-bordered w-full"
                             value={b.navigateTo}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                              update({ navigateTo: Number(e.target.value) })
+                              update(selectedPage, el.id, { navigateTo: Number(e.target.value) })
                             }
                           />
                         </div>
@@ -380,7 +663,7 @@ export default function CanvaLikeApp() {
                           className="input input-bordered w-full"
                           value={img.src}
                           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                            update({ src: e.target.value })
+                             update(selectedPage, el.id, { src: e.target.value })
                           }
                         />
                       </div>
@@ -397,7 +680,7 @@ export default function CanvaLikeApp() {
         <section className="min-h-48 w-full bg-base-100 shadow-md p-4 overflow-y-auto">
           <h2 className="text-xl font-bold mb-4">Layers</h2>
           <ul className="space-y-2">
-            {elements.map((el, idx) => (
+            {frames[selectedPage].map((el, idx) => (
               <li
                 key={el.id}
                 className={`flex justify-between items-center p-2 border rounded cursor-pointer ${
@@ -406,22 +689,23 @@ export default function CanvaLikeApp() {
                 onClick={() => setSelectedId(el.id)}
               >
                 <span className="truncate">
-                  {el.type.toUpperCase()} #{el.id}
+                  {el.type.toLowerCase().slice(0, 3)}#{el.id}
                 </span>
         
                 <div className="flex space-x-1">
                   {/* Move Up */}
                   <button
                     className="btn btn-xs"
-                    disabled={idx === elements.length - 1}
+                    disabled={idx === frames.length - 1}
                     onClick={(e) => {
                       e.stopPropagation()
-                      setElements((prev) => {
-                        const copy = [...prev]
-                        const [item] = copy.splice(idx, 1)
-                        copy.splice(idx + 1, 0, item)
-                        return copy
-                      })
+                      move(selectedPage, el.id, 'down')
+                      // setFrames((prev) => {
+                      //   const copy = [...prev]
+                      //   const [item] = copy.splice(idx, 1)
+                      //   copy.splice(idx + 1, 0, item)
+                      //   return copy
+                      // })
                     }}
                   >
                     <IconArrowNarrowDown size={14}/>
@@ -433,12 +717,13 @@ export default function CanvaLikeApp() {
                     disabled={idx === 0}
                     onClick={(e) => {
                       e.stopPropagation()
-                      setElements((prev) => {
-                        const copy = [...prev]
-                        const [item] = copy.splice(idx, 1)
-                        copy.splice(idx - 1, 0, item)
-                        return copy
-                      })
+                      move(selectedPage, el.id, 'up')
+                      // setFrames((prev) => {
+                      //   const copy = [...prev]
+                      //   const [item] = copy.splice(idx, 1)
+                      //   copy.splice(idx - 1, 0, item)
+                      //   return copy
+                      // })
                     }}
                   >
                     <IconArrowNarrowUp size={14} />
@@ -449,7 +734,7 @@ export default function CanvaLikeApp() {
                     className="btn btn-xs btn-error"
                     onClick={(e) => {
                       e.stopPropagation()
-                      setElements((prev) => prev.filter((x) => x.id !== el.id))
+                      remove(selectedPage, el.id);
                       if (selectedId === el.id) setSelectedId(null)
                     }}
                   >
@@ -463,7 +748,7 @@ export default function CanvaLikeApp() {
 
         <button 
             className='btn w-full bg-secondary-content text-secondary' 
-            onClick={() => {console.log(elements);}}
+            onClick={() => {console.log(frames);}}
         >
             Save
         </button>
