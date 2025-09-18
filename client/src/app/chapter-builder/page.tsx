@@ -1,6 +1,5 @@
 import { IconBook, IconCircleCheck, IconCirclePlusFilled, IconPencil } from "@tabler/icons-react";
 
-
 interface CourseStructure {
     type: 'quiz' | 'learn';
     title: string;
