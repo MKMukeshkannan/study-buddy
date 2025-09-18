@@ -2,68 +2,82 @@
 
 import { useState, FC, FormEvent, ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { useUserStore } from '@/utils/store';
 
-const Login: FC = () => {
+const Register: FC = () => {
   const router = useRouter(); 
 
-  const [email, setEmailInput] = useState<string>('');
+  const [name, setName] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [isStudent, setIsStudent] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
-  const {setId, setName, setEmail, setRole} = useUserStore();
+  const [success, setSuccess] = useState<string>('');
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
 
     const role = isStudent ? 'student' : 'teacher';
 
-    const credentials = {
+    const user = {
+      name,
       email,
       password,
       role,
+      profile_image_url: ""
     };
 
     try {
-      const apiUrl = `http://localhost:8080/auth/login`;
-      
-      const response = await fetch(apiUrl, {
+      const response = await fetch('http://localhost:8080/auth/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(credentials),
+        body: JSON.stringify(user),
       });
 
-      const data = await response.json();
+      interface ApiResponse {
+        error?: string;
+        message?: string;
+      }
+      
+      const data: ApiResponse = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to login');
+        throw new Error(data.error || 'Something went wrong');
       }
 
-      console.log('Login successful:', data);
-      setId(data.id)
-      setEmail(data.email)
-      setName(data.name)
-      setRole(data.role)
-
+      setSuccess('Registration successful! Redirecting to login...');
+      console.log('Success:', data);
+      
       setTimeout(() => {
-        router.push('/'); 
+        router.push('/login'); 
       }, 1500); 
 
     } catch (err: any) {
       setError(err.message);
-      console.error('Login failed:', err);
+      console.error('Failed to register:', err);
     }
   };
 
   return (
     <main className="flex flex-col items-center justify-center min-h-screen">
-      <h1 className="text-4xl font-bold text-center mb-10">Welcome Back!</h1>
+      <h1 className="text-4xl font-bold text-center mb-10">Create an Account</h1>
       
       <form onSubmit={handleSubmit} className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
         {error && <div className="alert alert-error mb-4">{error}</div>}
+        {success && <div className="alert alert-success mb-4">{success}</div>}
+
+        <label className="label">Name</label>
+        <input
+          type="text"
+          className="input"
+          placeholder="Name"
+          value={name}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
+          required
+        />
 
         <label className="label">Email</label>
         <input
@@ -71,10 +85,10 @@ const Login: FC = () => {
           className="input"
           placeholder="Email"
           value={email}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => setEmailInput(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
           required
         />
-        
+
         <label className="label">Password</label>
         <input
           type="password"
@@ -94,11 +108,11 @@ const Login: FC = () => {
             className="toggle toggle-xs"
           />
         </fieldset>
-        
-        <button type="submit" className="btn btn-neutral mt-4 w-full">Login</button>
+
+        <button type="submit" className="btn btn-neutral mt-4 w-full">Register</button>
       </form>
     </main>
   );
 };
 
-export default Login;
+export default Register;
