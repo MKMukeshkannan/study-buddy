@@ -1,0 +1,475 @@
+'use client'
+
+import { IconArrowNarrowDown, IconArrowNarrowUp, IconX } from '@tabler/icons-react'
+import React, { useRef, useState } from 'react'
+import { Rnd } from 'react-rnd'
+
+type BaseElement = {
+  id: string
+  x: number
+  y: number
+  width: number
+  height: number
+}
+
+type RectElement = BaseElement & { type: 'rect' }
+type TextElement = BaseElement & { type: 'text'; text: string; fontSize: number }
+type ButtonElement = BaseElement & { type: 'button'; text: string; navigateTo: number }
+type ImageElement = BaseElement & { type: 'image'; src: string }
+
+export type Element = RectElement | TextElement | ImageElement | ButtonElement
+
+export default function CanvaLikeApp() {
+  const canvasRef = useRef<HTMLDivElement>(null)
+  const [elements, setElements] = useState<Element[]>([])
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [canvasSize, setCanvasSize] = useState<{ width: number; height: number }>({ width: 800, height: 600, })
+
+  const handleDragStop = (id: string, x: number, y: number) => {
+    setElements(prev =>
+      prev.map(el => (el.id === id ? { ...el, x, y } : el))
+    )
+  }
+
+  const handleResizeStop = (
+    id: string,
+    x: number,
+    y: number,
+    width: number,
+    height: number
+  ) => {
+    setElements(prev =>
+      prev.map(el =>
+        el.id === id ? { ...el, x, y, width, height } : el
+      )
+    )
+  }
+
+  return (
+    <div className="flex h-screen bg-base-200">
+
+      {/* Sidebar */}
+      <aside className="bg-base-100 shadow-md transition-all duration-300 flex flex-col p-5 overflow-scroll">
+        <h1 className="text-3xl font-bold">Visual Novel</h1>
+        <section className="flex flex-col space-y-2">
+          <h3 className="text-lg font-semibold mt-4">Baseline Characters</h3>
+          {['teacher_1.svg', 'teacher_2.svg', 'teacher_3.svg', 'student_1.svg', 'student_2.svg'].map((val, ind) => (
+            <button
+              key={ind}
+              className="btn w-40 h-40 overflow-hidden rounded-lg border p-2"
+              onClick={() =>
+                setElements(prev => [
+                  ...prev,
+                  {
+                    id: Date.now().toString(),
+                    type: 'image',
+                    src: val,
+                    x: 100,
+                    y: 100,
+                    width: 120,
+                    height: 120,
+                  } as ImageElement,
+                ])
+              }
+            >
+              <img
+                draggable={false}
+                src={val}
+                alt={`${val} baseline`}
+                className="w-full h-full object-cover object-top"
+              />
+            </button>
+          ))}
+        
+          {/* Add Text */}
+          <h3 className="text-lg font-semibold mt-6">Insert Elements</h3>
+          <button
+            className="btn btn-outline w-40"
+            onClick={() =>
+              setElements(prev => [
+                ...prev,
+                {
+                  id: Date.now().toString(),
+                  type: 'text',
+                  text: 'New Text',
+                  fontSize: 20,
+                  x: 150,
+                  y: 150,
+                  width: 200,
+                  height: 50,
+                } as TextElement,
+              ])
+            }
+          >
+            Text
+          </button>
+        
+          {/* Add Button */}
+          <button
+            className="btn btn-outline w-40"
+            onClick={() =>
+              setElements(prev => [
+                ...prev,
+                {
+                  id: Date.now().toString(),
+                  type: 'button',
+                  text: 'Click Me',
+                  navigateTo: 0,
+                  x: 200,
+                  y: 200,
+                  width: 150,
+                  height: 50,
+                } as ButtonElement,
+              ])
+            }
+          >
+            Button
+          </button>
+        
+          {/* Add Rectangle */}
+          <button
+            className="btn btn-outline w-40"
+            onClick={() =>
+              setElements(prev => [
+                ...prev,
+                {
+                  id: Date.now().toString(),
+                  type: 'rect',
+                  x: 250,
+                  y: 250,
+                  width: 120,
+                  height: 80,
+                } as RectElement,
+              ])
+            }
+          >
+            Rectangle
+          </button>
+        </section>
+      </aside>
+
+      {/* Main Canvas */}
+      <main className="flex-1 p-6 bg-gray-200 flex flex-col">
+          {/* Document size controls */}
+          <div className="mb-4 flex space-x-4">
+            <label className="flex items-center space-x-2">
+              <span>Width</span>
+              <input
+                type="number"
+                className="input input-bordered w-24"
+                value={canvasSize.width}
+                onChange={(e) =>
+                  setCanvasSize((s) => ({ ...s, width: Number(e.target.value) }))
+                }
+              />
+            </label>
+            <label className="flex items-center space-x-2">
+              <span>Height</span>
+              <input
+                type="number"
+                className="input input-bordered w-24"
+                value={canvasSize.height}
+                onChange={(e) =>
+                  setCanvasSize((s) => ({ ...s, height: Number(e.target.value) }))
+                }
+              />
+            </label>
+          </div>
+        
+          {/* Canvas area */}
+          <div className="flex-1 flex justify-center items-center overflow-hidden">
+            <div
+              ref={canvasRef}
+              className="relative bg-white border shadow-md"
+              style={{
+                width: canvasSize.width,
+                height: canvasSize.height,
+              }}
+            >
+              {elements.map((el) => (
+                <Rnd
+                  key={el.id}
+                  size={{ width: el.width, height: el.height }}
+                  position={{ x: el.x, y: el.y }}
+                  onDragStop={(_, d) => handleDragStop(el.id, d.x, d.y)}
+                  onResizeStop={(_, __, ref, ___, pos) =>
+                    handleResizeStop(
+                      el.id,
+                      pos.x,
+                      pos.y,
+                      ref.offsetWidth,
+                      ref.offsetHeight
+                    )
+                  }
+                  // bounds="parent"
+                  onClick={() => setSelectedId(el.id)}
+                  className={`${
+                    selectedId === el.id ? 'ring-2 ring-blue-500' : ''
+                  }`}
+                >
+                  {el.type === 'rect' && (
+                    <div className="w-full h-full bg-red-400" />
+                  )}
+                  {el.type === 'text' && (
+                    <div
+                      className="flex items-center justify-center w-full h-full"
+                      style={{ fontSize: (el as TextElement).fontSize }}
+                    >
+                      {(el as TextElement).text}
+                    </div>
+                  )}
+                  {el.type === 'button' && (
+                    <button className="btn w-full h-full">
+                      {(el as ButtonElement).text}
+                    </button>
+                  )}
+                  {el.type === 'image' && (
+                    <img
+                        draggable="false"
+                      src={(el as ImageElement).src}
+                      alt="element"
+                      className="w-full h-full object-contain"
+                    />
+                  )}
+                </Rnd>
+              ))}
+            </div>
+          </div>
+      </main>
+
+      <aside className='w-14 min-h-screen'>
+      </aside>
+
+      <aside className='max-w-72 flex flex-col justify-between'>
+        <section className="w-72 bg-base-100 shadow-md p-4 overflow-y-auto flex-1">
+          <h2 className="text-xl font-bold mb-4">Inspector</h2>
+    
+          {selectedId ? (
+            (() => {
+              const el = elements.find(e => e.id === selectedId)
+              if (!el) return null
+    
+              // safe updater: accept a partial patch of Element and merge it
+              const update = (patch: Partial<Element>) => {
+                setElements(prev =>
+                  prev.map(e => (e.id === el.id ? ({ ...e, ...patch } as Element) : e))
+                )
+              }
+    
+              return (
+                <div className="space-y-3 text-sm">
+                  {/* Common Props */}
+                  <div>
+                    <label className="label">X</label>
+                    <input
+                      type="number"
+                      className="input input-bordered w-full"
+                      value={el.x}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        update({ x: Number(e.target.value) })
+                      }
+                    />
+                  </div>
+    
+                  <div>
+                    <label className="label">Y</label>
+                    <input
+                      type="number"
+                      className="input input-bordered w-full"
+                      value={el.y}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        update({ y: Number(e.target.value) })
+                      }
+                    />
+                  </div>
+    
+                  <div>
+                    <label className="label">Width</label>
+                    <input
+                      type="number"
+                      className="input input-bordered w-full"
+                      value={el.width}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        update({ width: Number(e.target.value) })
+                      }
+                    />
+                  </div>
+    
+                  <div>
+                    <label className="label">Height</label>
+                    <input
+                      type="number"
+                      className="input input-bordered w-full"
+                      value={el.height}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        update({ height: Number(e.target.value) })
+                      }
+                    />
+                  </div>
+    
+                  {/* Type-specific */}
+                  {el.type === 'text' && (() => {
+                    const t = el as TextElement
+                    return (
+                      <>
+                        <div>
+                          <label className="label">Text</label>
+                          <input
+                            type="text"
+                            className="input input-bordered w-full"
+                            value={t.text}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                              update({ text: e.target.value })
+                            }
+                          />
+                        </div>
+    
+                        <div>
+                          <label className="label">Font Size</label>
+                          <input
+                            type="number"
+                            className="input input-bordered w-full"
+                            value={t.fontSize}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                              update({ fontSize: Number(e.target.value) })
+                            }
+                          />
+                        </div>
+                      </>
+                    )
+                  })()}
+    
+                  {el.type === 'button' && (() => {
+                    const b = el as ButtonElement
+                    return (
+                      <>
+                        <div>
+                          <label className="label">Text</label>
+                          <input
+                            type="text"
+                            className="input input-bordered w-full"
+                            value={b.text}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                              update({ text: e.target.value })
+                            }
+                          />
+                        </div>
+    
+                        <div>
+                          <label className="label">Navigate To (page id)</label>
+                          <input
+                            type="number"
+                            className="input input-bordered w-full"
+                            value={b.navigateTo}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                              update({ navigateTo: Number(e.target.value) })
+                            }
+                          />
+                        </div>
+                      </>
+                    )
+                  })()}
+    
+                  {el.type === 'image' && (() => {
+                    const img = el as ImageElement
+                    return (
+                      <div>
+                        <label className="label">Source</label>
+                        <input
+                          type="text"
+                          className="input input-bordered w-full"
+                          value={img.src}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                            update({ src: e.target.value })
+                          }
+                        />
+                      </div>
+                    )
+                  })()}
+                </div>
+              )
+            })()
+          ) : (
+            <p className="text-gray-500">No element selected</p>
+          )}
+        </section>
+
+        <section className="min-h-48 w-full bg-base-100 shadow-md p-4 overflow-y-auto">
+          <h2 className="text-xl font-bold mb-4">Layers</h2>
+          <ul className="space-y-2">
+            {elements.map((el, idx) => (
+              <li
+                key={el.id}
+                className={`flex justify-between items-center p-2 border rounded cursor-pointer ${
+                  selectedId === el.id ? 'bg-blue-100' : 'bg-white'
+                }`}
+                onClick={() => setSelectedId(el.id)}
+              >
+                <span className="truncate">
+                  {el.type.toUpperCase()} #{el.id}
+                </span>
+        
+                <div className="flex space-x-1">
+                  {/* Move Up */}
+                  <button
+                    className="btn btn-xs"
+                    disabled={idx === elements.length - 1}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setElements((prev) => {
+                        const copy = [...prev]
+                        const [item] = copy.splice(idx, 1)
+                        copy.splice(idx + 1, 0, item)
+                        return copy
+                      })
+                    }}
+                  >
+                    <IconArrowNarrowDown size={14}/>
+                  </button>
+        
+                  {/* Move Down */}
+                  <button
+                    className="btn btn-xs"
+                    disabled={idx === 0}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setElements((prev) => {
+                        const copy = [...prev]
+                        const [item] = copy.splice(idx, 1)
+                        copy.splice(idx - 1, 0, item)
+                        return copy
+                      })
+                    }}
+                  >
+                    <IconArrowNarrowUp size={14} />
+                  </button>
+        
+                  {/* Delete */}
+                  <button
+                    className="btn btn-xs btn-error"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setElements((prev) => prev.filter((x) => x.id !== el.id))
+                      if (selectedId === el.id) setSelectedId(null)
+                    }}
+                  >
+                    <IconX size={14}/>
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <button 
+            className='btn w-full bg-secondary-content text-secondary' 
+            onClick={() => {console.log(elements);}}
+        >
+            Save
+        </button>
+      </aside>
+
+    </div>
+  )
+}
+

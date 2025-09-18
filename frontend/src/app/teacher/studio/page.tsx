@@ -87,7 +87,7 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ pageData, width = 640, height =
 
 
 export default function Page() {
-  const teacher_paths = [ 'teacher_1.svg', 'teacher_2.svg', 'teacher_3.svg', ];
+  const teacher_paths = [ 'teacher_2.svg', 'teacher_2.svg', 'teacher_3.svg', ];
   const student_paths = [ 'student_1.svg', 'student_2.svg', ];
 
 
