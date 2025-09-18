@@ -6,19 +6,26 @@ import { IconHammer, IconHome, IconPlus, IconSettings } from "@tabler/icons-reac
 import { useState } from "react";
 import { useUserStore } from "@/utils/store";
 import Student from "@/page/Student";
+import StudentProgressDashboard from "@/page/StudDash";
+import AggregateAnalyticsDashboard from "@/page/TeachDash";
 
 
 export default function Page() {
 
+  const [mounted, setMounted] = useState(false);
   const [ currentPage, setCurrentPage ] = useState<'home' | 'course' | 'setting'>('home');
   const router = useRouter();
-  const {getRole} = useUserStore()
-
-  const { getId } = useUserStore();
+  const {getRole, getId} = useUserStore()
 
   useEffect(() => {
     if (!getId()) { router.push('/login'); }
   }, [getId, router]);
+
+  useEffect(() => {
+    setMounted(true); // Once the component is mounted, update state
+  }, []);
+
+  if (!mounted) return null; // Don't render anything on the server
 
   if (!getId()) {
     return <div>Redirecting...</div>;
@@ -36,22 +43,18 @@ export default function Page() {
                     Home
                 </a>
               </li>
-              { getRole() !== 'student' && 
-                  <>
-                    <li onClick={() => setCurrentPage('course')}>
-                      <a className={`${currentPage === 'course' && "menu-active"}   `}>
-                          <IconHammer size={14}/>
-                          My Courses
-                      </a>
-                    </li>
-                    <li onClick={() => setCurrentPage('setting')}>
-                      <a className={`${currentPage === 'setting' && "menu-active"}   `}>
-                          <IconSettings size={14}/>
-                          Settings 
-                      </a>
-                    </li>
-                 </>
-              }
+              <li onClick={() => setCurrentPage('course')}>
+                <a className={`${currentPage === 'course' && "menu-active"}   `}>
+                    <IconHammer size={14}/>
+                    My Courses
+                </a>
+              </li>
+              <li onClick={() => setCurrentPage('setting')}>
+                <a className={`${currentPage === 'setting' && "menu-active"}   `}>
+                    <IconSettings size={14}/>
+                    Settings 
+                </a>
+              </li>
             </ul>
 
         </aside>
@@ -84,21 +87,17 @@ export default function Page() {
                 </div>
             </nav>
             <main className="p-5 flex h-0 flex-1 ">
-                {currentPage === 'home' && <Home />}
-                {currentPage === 'course' && <Course />}
+                {currentPage === 'home' && getRole() === 'teacher' && <AggregateAnalyticsDashboard />}
+                {currentPage === 'home' && getRole() === 'student' && <StudentProgressDashboard />}
+
+                {currentPage === 'course' && getRole() === 'teacher' && <Course />}
+                {currentPage === 'course' && getRole() === 'student' && <Student />}
             </main>
         </section>
     </section>
   );
 }
 
-const Home = () => {
-    const {getRole} = useUserStore()
-    if(getRole() === "student"){
-      return <Student />
-    }
-    return <h1>HOME</h1>
-};
 
 export type Lesson = { lesson_id: string; lesson_name: string; teacher_id: string; subject: string; };
 function Course() {

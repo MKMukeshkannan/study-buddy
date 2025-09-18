@@ -31,8 +31,8 @@ const TimelineComponent = ({content, i}: prop) => {
                     {content.module_type == 'QUIZ' && <IconPencil />}
                 </span>
                 { getRole() === 'student' ? 
-                    <span onClick={() => router.push(`preview/${content.module_id}`)}>{content.module_name}</span> :
-                    <span onClick={() => router.push(`/design/${content.module_id}`)}>{content.module_name}</span> }
+                    <span className="cursor-pointer" onClick={() => router.push(`preview/${content.module_id}`)}>{content.module_name}</span> :
+                    <span className="cursor-pointer" onClick={() => router.push(`/design/${content.module_id}`)}>{content.module_name}</span> }
               </div>
               <p className="max-w-md">{content.module_description}</p>
             </div>

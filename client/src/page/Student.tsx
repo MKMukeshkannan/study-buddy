@@ -13,6 +13,15 @@ export const Student = () => {
   const {getId} = useUserStore();
   const router = useRouter()
 
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    if (!getId()) { router.push('/login'); }
+  }, [getId, router]);
+  useEffect(() => { setMounted(true); }, []);
+
+
+
   useEffect(() => {
     async function fetchAllData() {
       try {
@@ -63,6 +72,7 @@ export const Student = () => {
     fetchAllData();
   }, [getId]);
 
+  if (!mounted) return null; // Don't render anything on the server
   const handleJoinLesson = async (lessonId: string) => {
     setJoinStatus(prev => ({...prev, [lessonId]: 'Joining...'}));
     try {
@@ -94,7 +104,7 @@ export const Student = () => {
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen p-4 sm:p-6 lg:p-8 w-full">
+    <div className="bg-gray-100  flex-1 p-4 sm:p-6 lg:p-8 w-full overflow-auto">
       <div className="mx-auto space-y-12">
         {loading && <p className="text-center text-gray-500">Loading lessons...</p>}
         {error && <p className="text-center text-red-500 bg-red-100 p-3 rounded-md">{error}</p>}
