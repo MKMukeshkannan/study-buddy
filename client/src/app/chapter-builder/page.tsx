@@ -1,3 +1,4 @@
+"use client"
 import { useUserStore } from "@/utils/store";
 import { IconBook, IconCircleCheck, IconCirclePlusFilled, IconPencil } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";

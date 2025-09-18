@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { IconHammer, IconHome, IconPlus, IconSettings } from "@tabler/icons-react";
 import { useState } from "react";
 import { useUserStore } from "@/utils/store";
+import Student from "@/page/Student";
 
 
 export default function Page() {
@@ -82,6 +83,10 @@ export default function Page() {
 }
 
 const Home = () => {
+    const {getRole} = useUserStore()
+    if(getRole() == "student"){
+      return <Student />
+    }
     return <h1>HOME</h1>
 };
 
