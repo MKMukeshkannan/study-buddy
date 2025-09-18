@@ -1,5 +1,7 @@
 'use client'
 
+import { useUserStore } from "@/utils/store";
+import { useRouter } from "next/navigation";
 import React, { useState, useRef, useEffect, useLayoutEffect } from "react";
 
 type BaseElement = {
@@ -21,6 +23,12 @@ const BASE_WIDTH = 800;
 const BASE_HEIGHT = 480;
 
 export default function FrameRenderer() {
+
+  const router = useRouter();
+  const {getId} = useUserStore();
+  if (getId == null) {
+    router.push("/login")
+  }
   const [frames] = useState<Element[][]>([
         [
             {

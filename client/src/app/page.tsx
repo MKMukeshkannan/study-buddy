@@ -4,11 +4,18 @@ import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { IconHammer, IconHome, IconPlus, IconSettings } from "@tabler/icons-react";
 import { useState } from "react";
+import { useUserStore } from "@/utils/store";
 
 
 export default function Page() {
 
   const [ currentPage, setCurrentPage ] = useState<'home' | 'course' | 'setting'>('home');
+  const router = useRouter();
+
+  const {getId} = useUserStore();
+  if (getId == null) {
+    router.push("/login")
+  }
 
   return (
     <section className="flex min-h-screen bg-gray-100">
@@ -85,6 +92,13 @@ function Course() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
+  // MODAL
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newLesson, setNewLesson] = useState({
+    lesson_name: '',
+    subject: '',
+  });
+
   useEffect(() => {
     async function fetchLessons() {
       try {
@@ -109,6 +123,29 @@ function Course() {
 
     fetchLessons();
   }, []);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setNewLesson(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleCreateLesson = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const { getId } = useUserStore.getState();
+      const res = await fetch('http://localhost:8080/lesson/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...newLesson, teacher_id: getId() }),
+      });
+      if (!res.ok) throw new Error('Failed to create lesson');
+    } catch (error) {
+      console.error(error);
+    }
+
+    setIsModalOpen(false); // Close modal
+    setNewLesson({ lesson_name: '', subject: '' }); // Reset form
+  };
 
   if (loading) return <div className="p-4 text-center">Loading lessons...</div>;
   if (error) return <div className="p-4 text-center text-error">Error: {error}</div>;
@@ -140,7 +177,9 @@ function Course() {
             </div>
           </article>
         ))}
-        <article className="flex items-center justify-center card shadow-md hover:shadow-lg transition-shadow duration-150 cursorpointer bg-white cursor-pointer">
+        <article
+          onClick={() => setIsModalOpen(true)}
+          className="flex items-center justify-center card shadow-md hover:shadow-lg transition-shadow duration-150 cursorpointer bg-white cursor-pointer">
             <IconPlus size={48}/>
         </article>
       </div>
@@ -148,6 +187,39 @@ function Course() {
       {lessons.length === 0 && (
         <div className="mt-8 text-center text-sm opacity-70">No lessons to display</div>
       )}
+
+      <dialog id="add_lesson_modal" className={`modal ${isModalOpen ? 'modal-open' : ''}`}>
+        <div className="modal-box">
+          <h3 className="font-bold text-lg">Add a New Lesson</h3>
+          <form onSubmit={handleCreateLesson}>
+            <div className="form-control py-4 space-y-4">
+              <input
+                type="text"
+                name="lesson_name"
+                placeholder="Lesson Name"
+                className="input input-bordered w-full"
+                value={newLesson.lesson_name}
+                onChange={handleInputChange}
+                required
+              />
+              <input
+                type="text"
+                name="subject"
+                placeholder="Subject"
+                className="input input-bordered w-full"
+                value={newLesson.subject}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+            <div className="modal-action">
+              <button type="button" className="btn" onClick={() => setIsModalOpen(false)}>Cancel</button>
+              <button type="submit" className="btn btn-primary">Create</button>
+            </div>
+          </form>
+        </div>
+      </dialog>
+
     </section>
   );
 }

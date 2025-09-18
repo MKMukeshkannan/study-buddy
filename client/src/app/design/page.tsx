@@ -4,6 +4,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { IconArrowNarrowDown, IconArrowNarrowUp, IconPlus, IconX } from '@tabler/icons-react'
 import React, { useRef, useState } from 'react'
 import { Rnd } from 'react-rnd'
+import { useUserStore } from '@/utils/store';
+import { useRouter } from 'next/navigation';
 
 type BaseElement = {
   id: string
@@ -22,6 +24,13 @@ export type Element = RectElement | TextElement | ImageElement | ButtonElement
 
 export default function CanvaLikeApp() {
   const canvasRef = useRef<HTMLDivElement>(null)
+  
+  const router = useRouter();
+  const {getId} = useUserStore();
+  if (getId == null) {
+    router.push("/login")
+  }
+
   const [frames, setFrames] = useState<Element[][]>(
       [
         [

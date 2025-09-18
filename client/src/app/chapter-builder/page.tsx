@@ -1,4 +1,6 @@
+import { useUserStore } from "@/utils/store";
 import { IconBook, IconCircleCheck, IconCirclePlusFilled, IconPencil } from "@tabler/icons-react";
+import { useRouter } from "next/navigation";
 
 interface CourseStructure {
     type: 'quiz' | 'learn';
@@ -37,6 +39,13 @@ const TimelineComponent = ({content, i}: prop) => {
 };
 
 export default function Page() {
+
+    const router = useRouter();
+    const {getId} = useUserStore();
+    if (getId == null) {
+      router.push("/login")
+    }
+
     const courses: CourseStructure[] = [
       {
         type: "learn",
