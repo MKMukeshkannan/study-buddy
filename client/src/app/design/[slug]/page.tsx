@@ -2,10 +2,11 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { IconArrowNarrowDown, IconArrowNarrowUp, IconPlus, IconX } from '@tabler/icons-react'
-import React, { useRef, useState } from 'react'
+import React, { use, useEffect, useRef, useState } from 'react'
 import { Rnd } from 'react-rnd'
 import { useUserStore } from '@/utils/store';
 import { useRouter } from 'next/navigation';
+import SimpleForm from '@/page/AIButton';
 
 type BaseElement = {
   id: string
@@ -22,292 +23,36 @@ type ImageElement = BaseElement & { type: 'image'; src: string }
 
 export type Element = RectElement | TextElement | ImageElement | ButtonElement
 
-export default function CanvaLikeApp() {
+export default function CanvaLikeApp({ params, }: { params: Promise<{ slug: string }> }) {
+  const { slug } = use(params)
   const canvasRef = useRef<HTMLDivElement>(null)
   
   const router = useRouter();
-  const {getId} = useUserStore();
-  if (getId == null) {
-    router.push("/login")
-  }
 
-  const [frames, setFrames] = useState<Element[][]>(
-      [
-        [
-            {
-                "height": 250,
-                "id": "teacher_intro_f0",
-                "src": "teacher_1.svg",
-                "type": "image",
-                "width": 150,
-                "x": 325,
-                "y": 200
-            },
-            {
-                "fontSize": 24,
-                "height": 50,
-                "id": "text_intro_f0",
-                "text": "Welcome! Today, we'll learn about chemical bonding.",
-                "type": "text",
-                "width": 500,
-                "x": 150,
-                "y": 80
-            },
-            {
-                "height": 40,
-                "id": "start_button_f0",
-                "navigateTo": 1,
-                "text": "Let's Start",
-                "type": "button",
-                "width": 100,
-                "x": 350,
-                "y": 150
-            }
-        ],
-        [
-            {
-                "height": 250,
-                "id": "teacher_menu_f1",
-                "src": "teacher_1.svg",
-                "type": "image",
-                "width": 150,
-                "x": 50,
-                "y": 200
-            },
-            {
-                "fontSize": 22,
-                "height": 50,
-                "id": "text_menu_f1",
-                "text": "There are three main types. Which one first?",
-                "type": "text",
-                "width": 500,
-                "x": 250,
-                "y": 80
-            },
-            {
-                "height": 40,
-                "id": "ionic_button_f1",
-                "navigateTo": 2,
-                "text": "Ionic Bonds",
-                "type": "button",
-                "width": 150,
-                "x": 350,
-                "y": 150
-            },
-            {
-                "height": 40,
-                "id": "covalent_button_f1",
-                "navigateTo": 3,
-                "text": "Covalent Bonds",
-                "type": "button",
-                "width": 150,
-                "x": 350,
-                "y": 210
-            },
-            {
-                "height": 40,
-                "id": "metallic_button_f1",
-                "navigateTo": 4,
-                "text": "Metallic Bonds",
-                "type": "button",
-                "width": 150,
-                "x": 350,
-                "y": 270
-            }
-        ],
-        [
-            {
-                "height": 250,
-                "id": "teacher_ionic_f2",
-                "src": "teacher_2.svg",
-                "type": "image",
-                "width": 150,
-                "x": 50,
-                "y": 200
-            },
-            {
-                "height": 200,
-                "id": "atom_giver_f2",
-                "src": "student_1.svg",
-                "type": "image",
-                "width": 150,
-                "x": 300,
-                "y": 220
-            },
-            {
-                "height": 200,
-                "id": "atom_taker_f2",
-                "src": "student_2.svg",
-                "type": "image",
-                "width": 150,
-                "x": 550,
-                "y": 220
-            },
-            {
-                "fontSize": 20,
-                "height": 50,
-                "id": "text_ionic_f2",
-                "text": "Ionic bonds: One atom gives an electron to another.",
-                "type": "text",
-                "width": 600,
-                "x": 100,
-                "y": 50
-            },
-            {
-                "height": 40,
-                "id": "button_menu_f2",
-                "navigateTo": 1,
-                "text": "Back to Menu",
-                "type": "button",
-                "width": 150,
-                "x": 420,
-                "y": 120
-            }
-        ],
-        [
-            {
-                "height": 250,
-                "id": "teacher_covalent_f3",
-                "src": "teacher_3.svg",
-                "type": "image",
-                "width": 150,
-                "x": 50,
-                "y": 200
-            },
-            {
-                "height": 200,
-                "id": "atom_sharer1_f3",
-                "src": "student_1.svg",
-                "type": "image",
-                "width": 150,
-                "x": 375,
-                "y": 220
-            },
-            {
-                "height": 200,
-                "id": "atom_sharer2_f3",
-                "src": "student_1.svg",
-                "type": "image",
-                "width": 150,
-                "x": 475,
-                "y": 220
-            },
-            {
-                "fontSize": 20,
-                "height": 50,
-                "id": "text_covalent_f3",
-                "text": "Covalent bonds: Atoms share electrons to become stable.",
-                "type": "text",
-                "width": 600,
-                "x": 100,
-                "y": 50
-            },
-            {
-                "height": 40,
-                "id": "button_menu_f3",
-                "navigateTo": 1,
-                "text": "Back to Menu",
-                "type": "button",
-                "width": 150,
-                "x": 420,
-                "y": 120
-            }
-        ],
-        [
-            {
-                "height": 250,
-                "id": "teacher_metallic_f4",
-                "src": "teacher_1.svg",
-                "type": "image",
-                "width": 150,
-                "x": 50,
-                "y": 200
-            },
-            {
-                "fontSize": 20,
-                "height": 50,
-                "id": "text_metallic_f4",
-                "text": "Metallic bonds are a 'sea' of electrons shared among atoms.",
-                "type": "text",
-                "width": 600,
-                "x": 100,
-                "y": 50
-            },
-            {
-                "height": 133,
-                "id": "atom_metal1_f4",
-                "src": "student_2.svg",
-                "type": "image",
-                "width": 100,
-                "x": 300,
-                "y": 250
-            },
-            {
-                "height": 133,
-                "id": "atom_metal2_f4",
-                "src": "student_2.svg",
-                "type": "image",
-                "width": 100,
-                "x": 400,
-                "y": 250
-            },
-            {
-                "height": 133,
-                "id": "atom_metal3_f4",
-                "src": "student_2.svg",
-                "type": "image",
-                "width": 100,
-                "x": 500,
-                "y": 250
-            },
-            {
-                "height": 40,
-                "id": "button_end_f4",
-                "navigateTo": 5,
-                "text": "Finish Lesson",
-                "type": "button",
-                "width": 150,
-                "x": 420,
-                "y": 120
-            }
-        ],
-        [
-            {
-                "height": 250,
-                "id": "teacher_end_f5",
-                "src": "teacher_1.svg",
-                "type": "image",
-                "width": 150,
-                "x": 325,
-                "y": 200
-            },
-            {
-                "fontSize": 24,
-                "height": 50,
-                "id": "text_end_f5",
-                "text": "Great work! You've learned the basics of bonding.",
-                "type": "text",
-                "width": 500,
-                "x": 150,
-                "y": 80
-            },
-            {
-                "height": 40,
-                "id": "restart_button_f5",
-                "navigateTo": 0,
-                "text": "Start Over",
-                "type": "button",
-                "width": 100,
-                "x": 350,
-                "y": 150
-            }
-        ]
-    ]
-  )
+  const [frames, setFrames] = useState<Element[][]>([[]])
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const [selectedPage, setSelectedPage] = useState<number>(0)
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [canvasSize, setCanvasSize] = useState<{ width: number; height: number }>({ width: 800, height: 480, })
+  const [canvasSize, _] = useState<{ width: number; height: number }>({ width: 800, height: 480, })
 
+  useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        const res = await fetch(`http://localhost:8080/mod/${slug}`);
+        if (!res.ok) throw new Error("Failed to fetch items");
+        const data: Element[][] = (await res.json()).modules.module_data;
+        setFrames(data);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchItems();
+  }, []);
   const move = (
       frameIndex: number,
       elementId: string,
@@ -387,7 +132,7 @@ export default function CanvaLikeApp() {
     });
   };
 
-  console.log(frames[selectedPage])
+  const baseline = ['teacher_1.svg', 'teacher_2.svg', 'teacher_3.svg', 'student_1.svg', 'student_2.svg'];
   return (
     <div className="flex h-screen bg-base-200">
 
@@ -396,7 +141,7 @@ export default function CanvaLikeApp() {
         <h1 className="text-3xl font-bold">Visual Novel</h1>
         <section className="flex flex-col space-y-2">
           <h3 className="text-lg font-semibold mt-4">Baseline Characters</h3>
-          {['teacher_1.svg', 'teacher_2.svg', 'teacher_3.svg', 'student_1.svg', 'student_2.svg'].map((val, ind) => (
+          {['/teacher_1.svg', '/teacher_2.svg', '/teacher_3.svg', '/student_1.svg', '/student_2.svg'].map((val, ind) => (
             <button
               key={ind}
               className="btn w-40 h-40 overflow-hidden rounded-lg border p-2"
@@ -439,6 +184,7 @@ export default function CanvaLikeApp() {
           >
             Rectangle
           </button>
+          <SimpleForm externalSetState={setFrames}/>
         </section>
       </aside>
 
@@ -519,8 +265,8 @@ export default function CanvaLikeApp() {
                   )}
                   {el.type === 'image' && (
                     <img
-                        draggable="false"
-                      src={(el as ImageElement).src}
+                      draggable="false"
+                      src={baseline.includes((el as ImageElement).src) ? `/${(el as ImageElement).src}` : (el as ImageElement).src}
                       alt="element"
                       className="w-full h-full object-contain"
                     />
@@ -672,7 +418,7 @@ export default function CanvaLikeApp() {
                           className="input input-bordered w-full"
                           value={img.src}
                           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                             update(selectedPage, el.id, { src: e.target.value })
+                             update(selectedPage, el.id, { src: `${e.target.value}`})
                           }
                         />
                       </div>

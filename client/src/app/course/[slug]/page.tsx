@@ -1,4 +1,5 @@
 'use client'
+import { useUserStore } from '@/utils/store';
 import { IconBook, IconCircleCheck, IconCirclePlusFilled, IconPencil } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
 import { use, useEffect, useState  } from 'react'
@@ -16,6 +17,7 @@ interface prop {
 };
 const TimelineComponent = ({content, i}: prop) => {
     const router = useRouter();
+    const {getRole} = useUserStore();
 
     return (<li>
             { i !== 0 && <hr /> }
@@ -28,7 +30,9 @@ const TimelineComponent = ({content, i}: prop) => {
                     {content.module_type == 'VNOVEL' && <IconBook />}
                     {content.module_type == 'QUIZ' && <IconPencil />}
                 </span>
-                <span onClick={() => router.push(`preview/${content.module_id}`)}>{content.module_name}</span>
+                { getRole() === 'student' ? 
+                    <span onClick={() => router.push(`preview/${content.module_id}`)}>{content.module_name}</span> :
+                    <span onClick={() => router.push(`/design/${content.module_id}`)}>{content.module_name}</span> }
               </div>
               <p className="max-w-md">{content.module_description}</p>
             </div>

@@ -14,6 +14,7 @@ const BASE_WIDTH = 800;
 const BASE_HEIGHT = 480;
 
 const App = ({ params, }: { params: Promise<{ slug: string }> }) => {
+  const baseline = ['teacher_1.svg', 'teacher_2.svg', 'teacher_3.svg', 'student_1.svg', 'student_2.svg'];
   const { slug } = use(params)
   const [frames, setFrames] = useState<Element[][]>([[]]);
   const [loading, setLoading] = useState(true);
@@ -50,7 +51,8 @@ const App = ({ params, }: { params: Promise<{ slug: string }> }) => {
 
     switch (el.type) {
       case "image":
-        return <img key={el.id} src={el.src} alt={el.id} style={scaledStyle} />;
+        return <img key={el.id} 
+                      src={baseline.includes((el as ImageElement).src) ? `/${(el as ImageElement).src}` : (el as ImageElement).src} alt={el.id} style={scaledStyle} />;
       case "text":
         return (
           <p
