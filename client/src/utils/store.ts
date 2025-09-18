@@ -63,3 +63,55 @@ export const useUserStore = create<UserState>()(
     }
   )
 );
+
+
+
+export interface FlashCard {
+  id: string;
+  question: string;
+  answer: string;
+}
+
+interface FlashCardState {
+  students: Record<string, FlashCard[]>; // studentId -> flashcards
+  addCard: (studentId: string, card: FlashCard) => void;
+  removeCard: (studentId: string, cardId: string) => void;
+  getCards: (studentId: string) => FlashCard[];
+}
+
+export const useFlashCardStore = create<FlashCardState>()(
+  persist(
+    (set, get) => ({
+      students: {},
+
+      addCard: (studentId, card) =>
+        set((state) => {
+          const cards = state.students[studentId] || [];
+          return {
+            students: {
+              ...state.students,
+              [studentId]: [...cards, card],
+            },
+          };
+        }),
+
+      removeCard: (studentId, cardId) =>
+        set((state) => {
+          const cards = state.students[studentId] || [];
+          return {
+            students: {
+              ...state.students,
+              [studentId]: cards.filter((c) => c.id !== cardId),
+            },
+          };
+        }),
+
+      getCards: (studentId) => {
+        return get().students[studentId] || [];
+      },
+    }),
+    {
+      name: "flashcard-storage", // key in localStorage
+    }
+  )
+);

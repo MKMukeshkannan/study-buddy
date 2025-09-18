@@ -15,30 +15,6 @@ interface CourseStructure {
 };
 
 
-interface prop {
-    content: CourseStructure;
-    i: number;
-};
-const TimelineComponent = ({content, i}: prop) => {
-    return (<li>
-            { i !== 0 && <hr /> }
-            <div className="timeline-middle">
-                <IconCircleCheck />
-            </div>
-            <div className={`${ i%2 ? 'timeline-end md:text-start': 'timeline-start md:text-end'} mb-10 `}>
-              <div className={`text-lg font-black flex gap-2 ${i%2?'justify-start ':'flex-row-reverse'}`}>
-                <span className="mt-1">
-                    {content.type == 'learn' && <IconBook />}
-                    {content.type == 'quiz' && <IconPencil />}
-                </span>
-                <span>{content.title}</span>
-              </div>
-              <p className="max-w-md">{content.description}</p>
-            </div>
-            <hr />
-          </li>)
-};
-
 export default function Page() {
 
     const router = useRouter();
