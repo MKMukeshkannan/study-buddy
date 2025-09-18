@@ -12,10 +12,16 @@ export default function Page() {
 
   const [ currentPage, setCurrentPage ] = useState<'home' | 'course' | 'setting'>('home');
   const router = useRouter();
+  const {getRole} = useUserStore()
 
-  const {getId} = useUserStore();
-  if (getId == null) {
-    router.push("/login")
+  const { getId } = useUserStore();
+
+  useEffect(() => {
+    if (!getId()) { router.push('/login'); }
+  }, [getId, router]);
+
+  if (!getId()) {
+    return <div>Redirecting...</div>;
   }
 
   return (
@@ -30,18 +36,22 @@ export default function Page() {
                     Home
                 </a>
               </li>
-              <li onClick={() => setCurrentPage('course')}>
-                <a className={`${currentPage === 'course' && "menu-active"}   `}>
-                    <IconHammer size={14}/>
-                    My Courses
-                </a>
-              </li>
-              <li onClick={() => setCurrentPage('setting')}>
-                <a className={`${currentPage === 'setting' && "menu-active"}   `}>
-                    <IconSettings size={14}/>
-                    Settings 
-                </a>
-              </li>
+              { getRole() !== 'student' && 
+                  <>
+                    <li onClick={() => setCurrentPage('course')}>
+                      <a className={`${currentPage === 'course' && "menu-active"}   `}>
+                          <IconHammer size={14}/>
+                          My Courses
+                      </a>
+                    </li>
+                    <li onClick={() => setCurrentPage('setting')}>
+                      <a className={`${currentPage === 'setting' && "menu-active"}   `}>
+                          <IconSettings size={14}/>
+                          Settings 
+                      </a>
+                    </li>
+                 </>
+              }
             </ul>
 
         </aside>
@@ -68,7 +78,7 @@ export default function Page() {
                         </a>
                       </li>
                       <li><a>Settings</a></li>
-                      <li><a>Logout</a></li>
+                      <li><a href="login">Logout</a></li>
                     </ul>
                   </div>
                 </div>
@@ -84,7 +94,7 @@ export default function Page() {
 
 const Home = () => {
     const {getRole} = useUserStore()
-    if(getRole() == "student"){
+    if(getRole() === "student"){
       return <Student />
     }
     return <h1>HOME</h1>

@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 import { Lesson } from "@/app/page";
 import { useUserStore } from "@/utils/store";
 import { useEffect, useState } from "react"
@@ -10,6 +11,7 @@ export const Student = () => {
   const [error, setError] = useState<string | null>(null);
   const [joinStatus, setJoinStatus] = useState<{[key: string]: string}>({});
   const {getId} = useUserStore();
+  const router = useRouter()
 
   useEffect(() => {
     async function fetchAllData() {
@@ -106,7 +108,7 @@ export const Student = () => {
                     <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
-                        <tr>
+                        <tr >
                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lesson Name</th>
                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subject</th>
                             <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
@@ -115,7 +117,7 @@ export const Student = () => {
                         <tbody className="bg-white divide-y divide-gray-200">
                         {joinedLessons.length > 0 ? (
                             joinedLessons.map((lesson) => (
-                            <tr key={lesson.lesson_id} className="hover:bg-gray-50">
+                            <tr onClick={() => router.push(`course/${lesson.lesson_id}`)} key={lesson.lesson_id} className="hover:bg-gray-50">
                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{lesson.lesson_name}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{lesson.subject}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
