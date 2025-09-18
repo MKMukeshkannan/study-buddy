@@ -502,6 +502,12 @@ export default function CanvaLikeApp({ params, }: { params: Promise<{ slug: stri
         </section>
 
         <button 
+            className='btn w-full' 
+            onClick={() => {router.push(`/course/preview/${slug}`)}}
+        >
+            Preview
+        </button>
+        <button 
             className='btn w-full bg-secondary-content text-secondary' 
             onClick={() => {console.log(frames);}}
         >

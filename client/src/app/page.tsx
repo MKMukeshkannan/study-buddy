@@ -2,7 +2,7 @@
 
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { IconHammer, IconHome, IconPlus, IconSettings } from "@tabler/icons-react";
+import { IconHammer, IconHome, IconLighter, IconPlus, IconSettings } from "@tabler/icons-react";
 import { useState } from "react";
 import { useUserStore } from "@/utils/store";
 import Student from "@/page/Student";
@@ -49,6 +49,15 @@ export default function Page() {
                     My Courses
                 </a>
               </li>
+              {
+                  getRole() === 'student' && 
+              <li onClick={() => setCurrentPage('setting')}>
+                <a className={`${currentPage === 'setting' && "menu-active"}   `}>
+                    <IconLighter size={14}/>
+                    Flash Card 
+                </a>
+              </li>
+              }
               <li onClick={() => setCurrentPage('setting')}>
                 <a className={`${currentPage === 'setting' && "menu-active"}   `}>
                     <IconSettings size={14}/>
@@ -106,6 +115,8 @@ function Course() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
+  const {getRole, getId} = useUserStore()
+
   // MODAL
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newLesson, setNewLesson] = useState({
@@ -121,7 +132,7 @@ function Course() {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ "teacher_id":"9946a560-297a-4f55-b4c2-7a1a654de888" }),
+          body: JSON.stringify({ "teacher_id": getId() }),
         });
 
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);

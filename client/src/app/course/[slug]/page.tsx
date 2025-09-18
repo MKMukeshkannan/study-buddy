@@ -61,7 +61,6 @@ export default function BlogPostPage({ params, }: { params: Promise<{ slug: stri
 
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         const data: CourseStructure[] = (await res.json()).lessons;
-        console.log(data)
         setCourseStructure(data);
       } catch (err: any) {
         setError(err.message);
