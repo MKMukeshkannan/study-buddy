@@ -51,8 +51,8 @@ export default function Page() {
               </li>
               {
                   getRole() === 'student' && 
-              <li onClick={() => setCurrentPage('setting')}>
-                <a className={`${currentPage === 'setting' && "menu-active"}   `}>
+              <li onClick={() => router.push('/flash')}>
+                <a className={``}>
                     <IconLighter size={14}/>
                     Flash Card 
                 </a>

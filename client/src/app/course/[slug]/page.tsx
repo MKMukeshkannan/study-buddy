@@ -61,6 +61,7 @@ export default function BlogPostPage({ params, }: { params: Promise<{ slug: stri
 
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         const data: CourseStructure[] = (await res.json()).lessons;
+
         setCourseStructure(data);
       } catch (err: any) {
         setError(err.message);
@@ -80,7 +81,7 @@ export default function BlogPostPage({ params, }: { params: Promise<{ slug: stri
             <h1 className="text-5xl font-black py-5">{lessonName}</h1>
             <main>
                 <ul className="timeline timeline-snap-icon max-md:timeline-compact timeline-vertical">
-                    { courseStructure.map((val, ind) => <TimelineComponent key={ind} content={val} i={ind} />) }
+                    { courseStructure && courseStructure.map((val, ind) => <TimelineComponent key={ind} content={val} i={ind} />) }
                     <li >
                         <hr />
                         <button onClick={() => { }} className="timeline-middle">
